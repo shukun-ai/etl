@@ -1,6 +1,14 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  Param,
+  Query,
+} from '@nestjs/common';
 
 import { AppService } from './app.service';
+
+import { appSchema } from './app.schema';
 
 @Controller()
 export class AppController {
@@ -10,8 +18,28 @@ export class AppController {
   async getData(
     @Param('dbName') dbName: string,
     @Param('collectionName') collectionName: string,
+    @Query()
+    queries: {
+      limit: string;
+      offset: string;
+      minUpdatedAt: string;
+      maxUpdatedAt: string;
+    }
   ) {
-    const rows = await this.appService.getData({dbName, collectionName});
+    const parsedQueries = this.getQueries(queries);
+    const rows = await this.appService.getData(
+      { dbName, collectionName },
+      parsedQueries
+    );
     return rows;
+  }
+
+  getQueries(queries: unknown) {
+    try {
+      const parsedQueries = appSchema.parse(queries);
+      return parsedQueries;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 }
