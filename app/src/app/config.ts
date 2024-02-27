@@ -11,8 +11,7 @@ export const configSchema = z.object({
             accessToken: z.string(),
             metadatas: z.record(z.string(), z.object({}))
         }
-    )),
-    convertorUrl: z.string(),
+    ))
 });
 
 export type ConfigSchema = z.infer<typeof configSchema>;
