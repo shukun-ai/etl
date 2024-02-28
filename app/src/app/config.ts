@@ -8,7 +8,7 @@ export const configSchema = z.object({
         {
             baseUrl: z.string(),
             orgName: z.string(),
-            accessToken: z.string(),
+            accessToken: z.string().optional(),
             metadatas: z.record(z.string(), z.object({}))
         }
     ))
@@ -19,7 +19,7 @@ export type ConfigSchema = z.infer<typeof configSchema>;
 export type SourceSchema = ConfigSchema['sources'][string];
 
 export const readConfig = async (): Promise<ConfigSchema> => {
-    const file = await readFile(join(process.cwd(), './config.json'), 'utf-8');
+    const file = await readFile(join(process.cwd(), process.env?.['APP_CONFIG_PATH'] ?? './data/config.json'), 'utf-8');
     return configSchema.parse(JSON.parse(file));
 }
 

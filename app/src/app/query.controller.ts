@@ -43,7 +43,7 @@ export class QueryController {
       baseUrl: source.baseUrl,
       retries: 3,
       onOrgName: () => source.orgName,
-      onAccessToken: () => source.accessToken,
+      onAccessToken: () => source.accessToken ?? null,
     });
     const requester = new SourceRequester(adaptor, atomName);
     const metadata = await requester.query({

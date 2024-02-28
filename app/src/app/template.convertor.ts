@@ -104,44 +104,44 @@ const electronsToFields = (
 ): Record<string, unknown> => {
   const fields: Record<string, unknown> = {
     id: { type: 'string' },
-    createdAt: {
-      anyOf: [{ type: 'string', format: 'date-time' }, { type: 'null' }],
-    },
-    updatedAt: {
-      anyOf: [{ type: 'string', format: 'date-time' }, { type: 'null' }],
-    },
-    owner: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+    createdAt: { type: ['string', 'null'], format: 'date-time' },
+    updatedAt: { type: ['string', 'null'], format: 'date-time' },
+    owner: { type: ['string', 'null'] },
   };
 
   electrons.forEach((electron) => {
-    const isNull = electron.isRequired ? [{ type: 'null' }] : [];
+    const field = electronToField(electron);
 
-    fields[electron.name] = {
-      anyOf: [electronToField(electron), ...isNull],
-    };
+    if (!electron.isRequired) {
+      field.type.push('null');
+    }
+
+    fields[electron.name] = field;
   });
 
   return fields;
 };
 
-const electronToField = (electron: MetadataElectron): unknown => {
+const electronToField = (
+  electron: MetadataElectron
+): { type: string[]; format?: string } => {
   switch (electron.fieldType) {
     case 'Attachment':
     case 'Mixed':
-      return { type: 'object' };
+      return { type: ['object'] };
     case 'Boolean':
-      return { type: 'boolean' };
+      return { type: ['boolean'] };
     case 'Currency':
     case 'Float':
-      return { type: 'number' };
+      return { type: ['number'] };
     case 'DateTime':
-      return { type: 'string', format: 'date-time' };
+      return { type: ['string'], format: 'date-time' };
     case 'Integer':
-      return { type: 'int' };
+      return { type: ['integer'] };
     case 'ManyToMany':
     case 'MultiSelect':
     case 'Role':
-      return { type: 'array' };
+      return { type: ['array'] };
     case 'SingleSelect':
     case 'LargeText':
     case 'ManyToOne':
@@ -149,6 +149,6 @@ const electronToField = (electron: MetadataElectron): unknown => {
     case 'Owner':
     case 'Password':
     case 'Text':
-      return { type: 'string' };
+      return { type: ['string'] };
   }
 };

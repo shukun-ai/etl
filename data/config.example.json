@@ -1,0 +1,12 @@
+{
+  "sources": {
+    "source_name": {
+      "baseUrl": "xxx",
+      "orgName": "xxx",
+      "accessToken": "xxx",
+      "metadatas": {
+        "tasks": {}
+      }
+    }
+  }
+}

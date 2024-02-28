@@ -1,6 +1,5 @@
-import { Controller, Get, Query, Res } from '@nestjs/common';
+import { Controller, Get, Param, Res } from '@nestjs/common';
 import { Response } from 'express';
-import { z } from 'zod';
 import { SourceRequester, AxiosAdaptor } from '@shukun/api';
 import { MetadataSchema } from '@shukun/schema';
 import { metadatasToTemplate } from './template.convertor';
@@ -9,9 +8,8 @@ import { SourceSchema, getSource, readConfig } from './config';
 
 @Controller()
 export class TemplateController {
-  @Get('/generate')
-  async generate(@Query() dto: unknown, @Res() response: Response,) {
-    const { sourceName } = dtoSchema.parse(dto);
+  @Get('/generate/:sourceName')
+  async generate(@Param('sourceName') sourceName: string, @Res() response: Response,) {
     const config = await readConfig();
     const source = getSource(config, sourceName);
     const metadatas: MetadataSchema[] = [];
@@ -37,7 +35,7 @@ export class TemplateController {
         baseUrl: source.baseUrl,
         retries: 3,
         onOrgName: () => source.orgName,
-        onAccessToken: () => source.accessToken
+        onAccessToken: () => source.accessToken ?? null
     })
     const requester = new SourceRequester(adaptor, atomName);
     const metadata = await requester.metadata();
@@ -46,6 +44,3 @@ export class TemplateController {
   }
 }
 
-const dtoSchema = z.object({
-  sourceName: z.string()
-});
